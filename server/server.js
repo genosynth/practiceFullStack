@@ -5,6 +5,7 @@ const port = 4000
 const db = require("./dbService")
 const bodyParser = require('body-parser'); // check if this is being used correctly!
 const cors = require("cors")
+const { response } = require("express")
 
 app.use(
     cors({
@@ -30,24 +31,36 @@ app.get('/', (req, res) => {
 })
 
 app.post('/authRegister', (req , res)=>{
-
+    let theBoolean = false;
     //const { username, email, password, passwordConfirm } = req.body; 
     const { username, email, password} = req.body
     console.log(username) 
 
-    
-    db.query('INSERT INTO users SET ?', {username: username, email: email, password: password , firstname: "fname", lastname: "lname"}, (error, results) => {
-        if(error) {
+    db.query('SELECT email FROM users WHERE email = ? OR username =?', [email,username], (error, results)=>{
+        if(error){
             console.log(error);
-
-        } else {
-            console.log(results);
-            
-            res.send('User Registered');
+        }
+        if (results.length > 0){
+            //theBoolean = true;
+            return res.send("Email address or username already in use")
         }
 
-
-    })   
+        db.query('INSERT INTO users SET ?', {username: username, email: email, password: password , firstname: "fname", lastname: "lname"}, (error, results) => {
+            if(error) {
+                console.log(error);
+    
+            } else {
+                console.log(results);
+                
+                res.send('User Registered');
+            }
+    
+    
+        })  
+    })
+    
+    //if (theBoolean==true){return}
+  
 })
 
 
