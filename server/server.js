@@ -5,7 +5,7 @@ const port = 4000
 const db = require("./dbService")
 const bodyParser = require('body-parser'); // check if this is being used correctly!
 const cors = require("cors")
-const { response } = require("express")
+const jwt = require("jsonwebtoken")
 
 app.use(
     cors({
@@ -30,8 +30,20 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
+app.get('/getUsers', (req, res)=>{
+    db.query('SELECT username FROM users', (error,results)=>{
+        if(error){
+            console.log(error)
+        }
+
+        if (results){
+            return res.send(results)
+        }
+
+    })
+})
 app.post('/authRegister', (req , res)=>{
-    let theBoolean = false;
+   
     //const { username, email, password, passwordConfirm } = req.body; 
     const { username, email, password} = req.body
     console.log(username) 
@@ -41,7 +53,7 @@ app.post('/authRegister', (req , res)=>{
             console.log(error);
         }
         if (results.length > 0){
-            //theBoolean = true;
+          
             return res.send("Email address or username already in use")
         }
 
@@ -58,9 +70,30 @@ app.post('/authRegister', (req , res)=>{
     
         })  
     })
-    
-    //if (theBoolean==true){return}
-  
+   
+})
+
+app.post('/authLogin', (req, res)=>{
+    const {username, password} = req.body
+
+    db.query('SELECT * FROM users where username = ? AND password = ?', [username,password], (error,results)=>{
+        if(error){
+            console.log(error)
+        }
+
+        if (results.length>0){
+            //results[0].
+            const token = jwt.sign({
+                username:results[0].username,
+                email: results[0].email
+            }, "secretqwerty")
+            
+            return res.send({token: token})
+        }
+
+        else {res.send("Incorrect username and/or password")}
+    })
+
 })
 
 

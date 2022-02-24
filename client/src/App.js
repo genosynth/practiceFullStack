@@ -1,6 +1,7 @@
 import './App.css';
 import LogIn from './components/LogIn';
 import Register from './components/Register';
+import Dashboard from "./components/Dashboard";
 import {
   BrowserRouter as Router,  
   Route, Routes  
@@ -13,6 +14,10 @@ function App() {
   const [registerUname, updateRegUname] = useState("") 
   const [registerEmail, updateRegEmail] = useState("") 
   const [registerPassword, updateRegPassword] = useState("") 
+
+  const [loginUname , updateLoginUname] = useState("")
+  const [loginPassword, updateLoginPassword] = useState("")
+  
   
 
   async function signUp(){
@@ -29,6 +34,25 @@ function App() {
     })
   }
 
+  function logIn(){
+
+    let loggedIn = {username: loginUname, password: loginPassword}
+
+    axios.post('http://localhost:4000/authLogin', loggedIn)
+    .then((res)=>{
+
+      if (res.data.token){
+        localStorage.setItem('token', res.data.token)
+        window.location.href="/dashboard"
+      }
+     
+      console.log(res.data)
+    })
+
+
+
+  }
+
 
   return (
     <div className="App">
@@ -37,11 +61,12 @@ function App() {
         <Routes>
 
         <Route path='/register' element={<Register signUp={signUp} updateRegUname={updateRegUname} updateRegEmail={updateRegEmail} updateRegPassword={updateRegPassword}/>}>
-          
         </Route>
       
-      <Route path="/login" element={<LogIn/>}>
-        
+      <Route path="/login" element={<LogIn logIn={logIn} updateLoginUname={updateLoginUname} updateLoginPassword={updateLoginPassword}/>}>
+      </Route>
+
+      <Route path="/dashboard" element={<Dashboard/>}>
       </Route>
 
       </Routes>

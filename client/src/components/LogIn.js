@@ -1,13 +1,21 @@
-import React from 'react'
+import React, {useRef} from 'react'
 
-export default function LogIn() {
+export default function LogIn({updateLoginUname, updateLoginPassword, logIn}) {
+
+  const uname = useRef()
+  const password = useRef()
+
   return (
     <div>
         <form>
 
-            <input placeholder='Username' required></input>
-            <input type="password" placeholder="Password" required></input>
-            <button>Log In</button>
+            <input ref={uname} type="text" placeholder='Username' required onChange={()=>{
+              updateLoginUname(uname.current.value)
+            }}></input>
+            <input ref={password} type="password" placeholder="Password" required onChange={()=>{
+              updateLoginPassword(password.current.value)
+            }}></input>
+            <button type='submit' onClick={()=>{logIn()}}>Log In</button>
         </form>
     </div>
   )
